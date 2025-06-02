@@ -1,0 +1,612 @@
+---
+title: "New file"
+description: "Description of your new file."
+---
+
+Okay, here's the English version of the project structure and the development & task management plan for the Synapse project.
+
+---
+
+**Proposed Project Structure for Synapse (Final Product) - English Version**
+
+\`\`\`markdown
+
+synapse_project/
+
+├── .github/                    # GitHub-specific files (e.g., workflows for CI/CD)
+│   └── workflows/
+│       ├── cicd_pipeline.yml   # Main CI/CD Pipeline (Lint, Test, Build, Deploy)
+│       └── data_pipeline.yml   # Workflow for triggering/monitoring the Vertex AI data pipeline
+│
+├── .vscode/                    # VSCode specific settings (optional, for team consistency)
+│   └── settings.json
+│
+├── app/                        # Main application (Backend API and Frontend)
+│   ├── backend/                # FastAPI Backend application
+│   │   ├── app/                # Core application logic
+│   │   │   ├── api/            # API Endpoints (Routers)
+│   │   │   │   ├── v1/
+│   │   │   │   │   ├── endpoints/
+│   │   │   │   │   │   ├── [search.py](http://search.py)
+│   │   │   │   │   │   ├── [graph.py](http://graph.py)
+│   │   │   │   │   │   └── [documents.py](http://documents.py)
+│   │   │   │   │   └── api\_[v1.py](http://v1.py) # Main router for v1
+│   │   │   │   └── [deps.py](http://deps.py)     # Dependencies (e.g., DB sessions)
+│   │   │   ├── core/           # Core configuration, security
+│   │   │   │   └── [config.py](http://config.py)
+│   │   │   ├── crud/           # Create, Read, Update, Delete operations (data
+│   │   │   │   ├── crud\_[document.py](http://document.py)
+│   │   │   │   └── crud\_[concept.py](http://concept.py)
+│   │   │   ├── models/         # Pydantic models for API Request/Response
+│   │   │   │   ├── [document.py](http://document.py)
+│   │   │   │   ├── [concept.py](http://concept.py)
+
+│   │   │   │   └── [search.py](http://search.py)
+
+│   │   │   ├── schemas/        # Pydantic models for database layers (optional, if different from API models)
+
+│   │   │   ├── services/       # Business logic, interaction with external services (Neo4j, ChromaDB/Vertex AI ME, LLMs)
+
+│   │   │   │   ├── search\_[service.py](http://service.py)
+
+│   │   │   │   ├── graph\_[service.py](http://service.py)
+
+│   │   │   │   └── rag\_[service.py](http://service.py)
+
+│   │   │   └── [main.py](http://main.py)         # FastAPI App Initialization
+
+│   │   ├── tests/              # Backend Tests
+
+│   │   │   ├── api/
+
+│   │   │   ├── crud/
+
+│   │   │   └── services/
+
+│   │   ├── Dockerfile          # Dockerfile for the backend
+
+│   │   └── requirements.txt    # Python dependencies for the backend
+
+│   │
+
+│   └── frontend/               # Frontend application (e.g., React/Next.js)
+
+│       ├── public/             # Static assets
+
+│       ├── src/                # Frontend source code
+
+│       │   ├── components/     # Reusable UI components
+
+│       │   ├── contexts/       # React Contexts
+
+│       │   ├── hooks/          # Custom React Hooks
+
+│       │   ├── layouts/        # Page layouts
+
+│       │   ├── pages/          # Page components (Next.js) or Views
+
+│       │   ├── services/       # API client for backend communication
+
+│       │   ├── styles/         # Global styles, themes
+
+│       │   ├── types/          # TypeScript type definitions
+
+│       │   ├── utils/          # Helper functions
+
+│       │   └── App.js          # (or index.js/main.js depending on framework)
+
+│       ├── tests/              # Frontend Tests
+
+│       ├── Dockerfile          # Dockerfile for the frontend
+
+│       ├── package.json
+
+│       └── ...                 # Other frontend-specific configuration files
+
+│
+
+├── data_processing/            # Scripts and configurations for data acquisition and processing
+
+│   ├── notebooks/              # Jupyter Notebooks for exploration, experiments (not part of prod. pipeline)
+
+│   ├── pipelines/              # Definitions for Vertex AI Pipelines (or other orchestration tools)
+
+│   │   └── synapse_knowledge_graph_pipeline/
+
+│   │       ├── components/     # Individual pipeline components (as Python functions or containers)
+
+│   │       │   ├── pdf_processor\_[component.py](http://component.py)
+
+│   │       │   ├── notebook_processor\_[component.py](http://component.py)
+
+│   │       │   ├── web_scraper\_[component.py](http://component.py)
+
+│   │       │   ├── youtube_scraper\_[component.py](http://component.py)
+
+│   │       │   ├── markdown_formatter\_[component.py](http://component.py)
+
+│   │       │   ├── chunker\_[component.py](http://component.py)
+
+│   │       │   ├── embedder\_[component.py](http://component.py)
+
+│   │       │   ├── neo4j_loader\_[component.py](http://component.py)
+
+│   │       │   └── vector_db_loader\_[component.py](http://component.py)
+
+│   │       ├── [pipeline.py](http://pipeline.py)     # Main definition file for the Vertex AI Pipeline
+
+│   │       └── Dockerfile      # Dockerfile for custom pipeline components
+
+│   ├── scripts/                # Standalone scripts (which could be wrapped into pipeline components)
+
+│   │   ├── acquisition/
+
+│   │   │   ├── web\_[scraper.py](http://scraper.py)
+
+│   │   │   ├── config\_[webscraper.py](http://webscraper.py)
+
+│   │   │   ├── utils\_[webscraper.py](http://webscraper.py)
+
+│   │   │   ├── scraper_yt\_[enhanced.py](http://enhanced.py)
+
+│   │   │   └── ...
+
+│   │   ├── formatting/
+
+│   │   │   ├── markdown_formatter\_[vertex.py](http://vertex.py) # (or whatever the final version is named)
+
+│   │   │   └── ...
+
+│   │   ├── processing/
+
+│   │   │   ├── chunk\_[processor.py](http://processor.py)
+
+│   │   │   ├── concept\_[extractor.py](http://extractor.py)
+
+│   │   │   └── ...
+
+│   │   └── loading/
+
+│   │       ├── neo4j\_[uploader.py](http://uploader.py)
+
+│   │       └── chromadb\_[uploader.py](http://uploader.py) # (or vertex_ai_matching_engine\_[uploader.py](http://uploader.py))
+
+│   ├── prompts/                # Collection of all prompts for LLMs
+
+│   │   ├── markdown_formatting_prompt\_[vX.md](http://vX.md)
+
+│   │   └── rag_system_prompt\_[vX.md](http://vX.md)
+
+│   ├── tests/                  # Tests for data processing scripts and pipeline components
+
+│   └── requirements.txt        # Python dependencies for data processing
+
+│
+
+├── data/                       # Persistent data (raw data, processed data, models, etc.)
+
+│   │                           # This structure should follow the logic in `Ordnerstruktur.md` ([FolderStructure.md](http://FolderStructure.md)),
+
+│   │                           # but organized at a higher level.
+
+│   ├── 00_raw/                 # Original, unaltered source files
+
+│   │   ├── lectures_pdf/
+
+│   │   ├── challenges_notebooks/
+
+│   │   ├── web_articles_html/  # (or whatever the web scraper initially saves)
+
+│   │   └── youtube_raw/        # (Videos, original transcripts, metadata from scraper)
+
+│   ├── 01_standardized_markdown/ # Markdown files after initial conversion & formatting
+
+│   │   ├── lectures/
+
+│   │   ├── challenges/
+
+│   │   ├── web_articles/
+
+│   │   └── youtube_transcripts/
+
+│   ├── 02_processed_for_db/    # Data ready to be loaded into DBs (e.g., CSVs for Neo4j Batch Import)
+
+│   │   ├── neo4j_nodes/
+
+│   │   └── neo4j_relationships/
+
+│   ├── 03_assets/              # Media files referenced by Markdown files
+
+│   │   └── images/             # Structure: images/{document_id}/{image_filename}
+
+│   ├── 04_vector_db_exports/   # (Optional, for backups or migrations of ChromaDB)
+
+│   ├── 05_knowledge_graph_exports/ # (Optional, for backups of Neo4j)
+
+│   └── 06_logs/                # Logs from data processing pipelines
+
+│       ├── data_pipeline_runs/
+
+│       └── scraping_runs/
+
+│
+
+├── config/                     # Global configurations not directly tied to a component
+
+│   ├── global_app_settings.yml # (or .ini, .toml)
+
+│   ├── logging_config.json     # Global logging configuration
+
+│   └── neo4j_schema.cql        # (Optional, Cypher script for schema creation/indexing)
+
+│
+
+├── docs/                       # Project documentation (outside of code)
+
+│   ├── [architecture.md](http://architecture.md)         # System architecture overview
+
+│   ├── data\_[model.md](http://model.md)           # Detailed description of the data model (Neo4j, Vector DB)
+
+│   ├── api\_[reference.md](http://reference.md)        # API documentation (can also be auto-generated by FastAPI)
+
+│   ├── setup\_[guide.md](http://guide.md)          # Guide for setting up the development environment
+
+│   ├── deployment\_[guide.md](http://guide.md)     # Guide for deployment
+
+│   └── adr/                    # Architecture Decision Records
+
+│
+
+├── tests/                      # Global integration tests, End-to-End tests
+
+│   └── e2e/
+
+│
+
+├── .dockerignore
+
+├── .env.example                # Example for environment variables
+
+├── .gitignore
+
+├── Dockerfile                  # (Optional, for a combined build or Docker Compose)
+
+├── docker-compose.yml          # For local development and orchestration of services (Backend, Frontend, DBs)
+
+├── LICENSE
+
+├── Makefile                    # (Optional, for frequently used development commands)
+
+└── [README.md](http://README.md)                   # Main project README
+
+\`\`\`
+
+---
+
+**Explanations of the Structure:**
+
+\*   \*`.github/` & `.vscode/`\*\*: Standard folders for version control workflows and IDE-specific settings to improve team collaboration.
+
+\*   \*`app/`\*\*: Contains all code for the running application, clearly separated into `backend` and `frontend`.
+
+    \*   \*`backend/`\*\*: Follows a typical structure for FastAPI applications, promoting modularity and testability (routers, CRUD operations, models/schemas, services).
+
+    \*   \*`frontend/`\*\*: A standard structure for modern JavaScript frameworks like React/Next.js.
+
+\*   \*`data_processing/`\*\*: The core for all scripts and configurations related to data acquisition, transformation, and loading.
+
+    \*   \*`pipelines/`\*\*: Important for orchestration with Vertex AI Pipelines. Each pipeline component can be defined here as a standalone module or Docker image.
+
+    \*   \*`scripts/`\*\*: Contains Python scripts that are either run directly or serve as the basis for pipeline components. Subdividing by functionality (acquisition, formatting, processing, loading) increases clarity.
+
+    \*   \*`prompts/`\*\*: Central location for managing and versioning all LLM prompts.
+
+\*   \*`data/`\*\*: Clearly structured folder for all data artifacts, from raw data to processed and exported data. Numbering (00\\\_, 01\\\_) helps visualize the data flow.
+
+    \*   \*`03_assets/images/`\*\*: The structure `images/{document_id}/{image_filename}` is centralized here to keep referencing from Markdown files (located in `01_standardized_markdown`) consistent. Markdown files would then use relative paths like `../../03_assets/images/{document_id}/{image_filename}`, or assets are placed during deployment so that paths `assets/images/...` work directly from Markdown.
+
+\*   \*`config/`\*\*: For global configurations not specific to a single application component (backend, frontend, data processing).
+
+\*   \*`docs/`\*\*: Comprehensive project documentation beyond code comments.
+
+\*   \*`tests/`\*\*: A place for higher-level integration tests or end-to-end tests spanning multiple components. Individual components (backend, frontend, data processing) have their own test directories.
+
+\*   **Root Directory Files**:
+
+    \*   `Dockerfile` (optional, global): Could be used for a combined build if not done per component (backend/frontend).
+
+    \*   `docker-compose.yml`: Very important for local development to easily start and manage all services (backend, frontend, Neo4j, ChromaDB).
+
+    \*   `.env.example`: Template for required environment variables.
+
+    \*   `Makefile` (optional): Can be useful for standardizing common commands (run tests, build Docker, run linters).
+
+**Structural Considerations:**
+
+\*   **Modularity:** The structure is designed so that individual parts of the project (backend, frontend, data pipeline) can be developed, tested, and potentially deployed relatively independently.
+
+\*   **Scalability:** Separation of data processing and application, along with the planned use of Vertex AI Pipelines, supports scalability.
+
+\*   **Maintainability:** Clear responsibilities and logical grouping of files make the code easier to understand and maintain.
+
+\*   **Testability:** Dedicated test folders at various levels encourage good test coverage.
+
+\*   **Consistency:** The structure attempts to follow common conventions, making it easier for new team members to get started.
+
+---
+
+**Development and Task Management Plan: Synapse Project - English Version**
+
+**Version:** 1.0
+
+**Date:** May 31, 2025
+
+**Goal:** Successful implementation of the Minimum Viable Product (MVP) within 9 working days.
+
+**Table of Contents:**
+
+1.  Introduction and Objectives
+
+2.  Assumptions and Framework
+
+3.  Team Roles (Conceptual)
+
+4.  Development Phases and Timeline
+
+5.  Detailed Task Plan
+
+6.  Task Management and Collaboration
+
+7.  Risk Management (Brief Overview)
+
+8.  Definition of Done (MVP)
+
+---
+
+**1. Introduction and Objectives**
+
+This plan outlines the necessary steps, tasks, and timelines for developing the Synapse MVP. The main objective is to create a functional application demonstrating core features: data ingestion and standardization, knowledge graph creation, semantic search, and an RAG-based Q&A system.
+
+**2. Assumptions and Framework**
+
+\*   **Team Size:** 4-5 members.
+
+\*   **Timeframe:** 9 working days.
+
+\*   **MVP Scope:** As defined in `Minimum Viable Product.md` and MVP User Stories.
+
+\*   **Technology Stack:** As defined in `Tech-Stack.md` and `Pitch 1.md` (Python/FastAPI, Neo4j, ChromaDB, Vertex AI, React/Next.js as preferred frontend).
+
+\*   **Existing Artifacts:** Basic scripts for scraping and parts of Markdown formatting exist and will be integrated/adapted.
+
+\*   **Project Structure:** Aligned with the previously developed proposal.
+
+**3. Team Roles (Conceptual)**
+
+For efficient task distribution, we define the following roles. Team members can take on multiple roles:
+
+\*   **Backend Developer (BE):** Focus on API development, database interaction, business logic.
+
+\*   **Frontend Developer (FE):** Focus on UI/UX implementation, visualization.
+
+\*   **Data Engineer (DE):** Focus on data pipelines, scripting for data acquisition and transformation, database population.
+
+\*   **NLP/ML Specialist (NLP/ML):** Focus on concept extraction, embedding strategies, RAG implementation, LLM interaction.
+
+\*   **DevOps/Integrator (DO):** Focus on project setup, CI/CD (simplified), Dockerization, deployment, overall integration.
+
+**4. Development Phases and Timeline (9 Days)**
+
+We divide the project into phases spanning the 9 days. Due to the short timeframe, these are more like fluid transitions than rigid sprints.
+
+\*   **Phase 1: Setup, Planning & Base Data Acquisition (Day 1-2)**
+
+\*   **Phase 2: Core Data Processing & Database Population (Day 2-4)**
+
+\*   **Phase 3: Backend API & RAG Service Development (Day 4-6)**
+
+\*   **Phase 4: Frontend Development (MVP Features) (Day 5-8)**
+
+\*   **Phase 5: Integration, End-to-End Testing & Refinement (Day 7-9)**
+
+\*   **Phase 6: Deployment & Demo Preparation (Day 9)**
+
+**5. Detailed Task Plan**
+
+\*   **Task Management Tool:** GitHub Issues / Trello / Asana (Team decides)
+
+\*   **Status:** `Open`, `In Progress`, `Review`, `Done`
+
+\*   **Prio:** 1 (High), 2 (Medium), 3 (Low)
+
+---
+
+**Phase 1: Setup, Planning & Base Data Acquisition (Day 1-2)**
+
+---
+
+| ID   | Task Description                                                                                             | Role(s)    | Prio | Est. Duration | Depends On | Status |
+
+|------|--------------------------------------------------------------------------------------------------------------|------------|------|---------------|------------|--------|
+
+| P1.1 | Initialize project repository (Git), create proposed folder structure.                                       | DO         | 1    | 0.5 days      | -          | Open   |
+
+| P1.2 | Create `.env.example`, document API keys and sensitive configurations (manage team access).                  | DO, All    | 1    | 0.25 days     | P1.1       | Open   |
+
+| P1.3 | Create Dockerfiles (base versions for Backend, Frontend, Neo4j, ChromaDB); `docker-compose.yml` for local dev. | DO         | 1    | 1 day         | P1.1       | Open   |
+
+| P1.4 | Review and consolidate existing scraping scripts `webscraper.py`, `my_yt_scraper.py`).                        | DE, NLP/ML | 1    | 1 day         | -          | Open   |
+
+| P1.5 | Review and adapt initial conversion scripts `pd_to_md.py`, `nb_to_md.py`).                                    | DE, NLP/ML | 1    | 1 day         | -          | Open   |
+
+| P1.6 | Finalize MVP dataset `MVP-Datensatz.md`) and acquire/store initial raw data locally.                          | DE         | 1    | 0.5 days      | P1.4, P1.5 | Open   |
+
+| P1.7 | Finalize and test `markdown_formatter_vertex.py` (or `_tool.py`) for all MVP dataset source types.             | DE, NLP/ML | 1    | 1 day         | P1.6       | Open   |
+
+| P1.8 | Define basic API endpoint structure (FastAPI) and Pydantic models for core entities.                           | BE         | 2    | 0.5 days      | -          | Open   |
+
+---
+
+**Phase 2: Core Data Processing & Database Population (Day 2-4)**
+
+---
+
+| ID   | Task Description                                                                                             | Role(s)    | Prio | Est. Duration | Depends On   | Status |
+
+|------|--------------------------------------------------------------------------------------------------------------|------------|------|---------------|--------------|--------|
+
+| P2.1 | Implement: Markdown Parsing and Chunking logic.                                                              | DE, NLP/ML | 1    | 1 day         | P1.7         | Open   |
+
+| P2.2 | Implement: Concept Extraction (spaCy Noun Phrases, YAML keywords, headings).                                   | NLP/ML     | 1    | 1 day         | P2.1         | Open   |
+
+| P2.3 | Implement: Embedding Generation with Vertex AI Embedding API for chunks and concepts.                          | NLP/ML, DE | 1    | 1 day         | P2.1, P2.2   | Open   |
+
+| P2.4 | Neo4j: Implement schema definition (Nodes, Edges, Properties) in Cypher, create indexes.                       | BE, DE     | 1    | 0.5 days      | -            | Open   |
+
+| P2.5 | Implement: Script to populate Neo4j with documents, chunks, concepts, and basic relations.                   | BE, DE     | 1    | 1.5 days      | P2.1, P2.2, P2.4 | Open   |
+
+| P2.6 | Implement: Script to populate ChromaDB with chunk embeddings and metadata.                                     | BE, DE     | 1    | 1 day         | P2.3         | Open   |
+
+| P2.7 | **(Stretch Goal MVP)** Design & Implement a simplified Vertex AI Pipeline for data processing (P1.7 to P2.6). | DE, DO     | 2    | (2 days)      | P2.5, P2.6   | Open   |
+
+| P2.8 | Test run data pipeline with MVP dataset and validate database contents.                                        | All        | 1    | 0.5 days      | P2.5, P2.6   | Open   |
+
+---
+
+**Phase 3: Backend API & RAG Service Development (Day 4-6)**
+
+---
+
+| ID   | Task Description                                                                                             | Role(s)    | Prio | Est. Duration | Depends On   | Status |
+
+|------|--------------------------------------------------------------------------------------------------------------|------------|------|---------------|--------------|--------|
+
+| P3.1 | API Endpoint: Concept search in graph (returns concept and connected nodes).                                   | BE         | 1    | 1 day         | P2.5         | Open   |
+
+| P3.2 | API Endpoint: Semantic search over chunks (takes query, returns relevant chunks).                              | BE, NLP/ML | 1    | 1 day         | P2.6         | Open   |
+
+| P3.3 | RAG Service: Integrate LangChain, Gemini API; takes query \+ context chunks, generates answer.                  | NLP/ML, BE | 1    | 1.5 days      | P3.2         | Open   |
+
+| P3.4 | API Endpoint: Question-Answering (takes query, calls P3.2 & P3.3, returns answer \+ sources).                   | BE         | 1    | 0.5 days      | P3.3         | Open   |
+
+| P3.5 | API Endpoint: Retrieve document details / chunk contents.                                                      | BE         | 2    | 0.5 days      | P2.5         | Open   |
+
+| P3.6 | API Endpoint: Filter options for search (e.g., by `document_type`, `lecture_group`).                           | BE         | 2    | 0.5 days      | P3.2         | Open   |
+
+| P3.7 | Basic API authentication/authorization (if relevant for demo, otherwise minimal).                              | BE         | 3    | (0.5 days)    | -            | Open   |
+
+| P3.8 | API Documentation (auto-generated by FastAPI, supplement if needed).                                           | BE         | 2    | 0.25 days     | P3.1-P3.6    | Open   |
+
+---
+
+**Phase 4: Frontend Development (MVP Features) (Day 5-8)**
+
+---
+
+| ID   | Task Description                                                                                                | Role(s) | Prio | Est. Duration | Depends On       | Status |
+
+|------|-----------------------------------------------------------------------------------------------------------------|---------|------|---------------|------------------|--------|
+
+| P4.1 | Set up Frontend project (React/Next.js or Streamlit, per team decision).                                        | FE      | 1    | 0.5 days      | -                | Open   |
+
+| P4.2 | Implement: Main layout (Header, Graph area, Search bar, Detail view area).                                      | FE      | 1    | 1 day         | P4.1             | Open   |
+
+| P4.3 | Implement: Interactive Graph Visualization component (display nodes/edges, basic interaction).                  | FE      | 1    | 1.5 days      | P3.1, P4.2       | Open   |
+
+| P4.4 | Implement: Search input field for concepts (graph) and semantic search (text).                                  | FE      | 1    | 0.5 days      | P3.1, P3.2, P4.2 | Open   |
+
+| P4.5 | Implement: Display of search results (list of relevant chunks, concept details).                                | FE      | 1    | 1 day         | P4.4             | Open   |
+
+| P4.6 | Implement: Q&A Interface (input field for questions, display RAG answer and sources).                           | FE      | 1    | 1 day         | P3.4, P4.2       | Open   |
+
+| P4.7 | Implement: Display of document outlines / chunk contents in detail view.                                        | FE      | 2    | 1 day         | P3.5, P4.2       | Open   |
+
+| P4.8 | Implement: Filter UI for search results.                                                                        | FE      | 2    | 0.5 days      | P3.6, P4.5       | Open   |
+
+| P4.9 | Integrate Syntax Highlighting for code examples and LaTeX rendering in frontend.                                | FE      | 2    | 0.5 days      | P4.5, P4.7       | Open   |
+
+---
+
+**Phase 5: Integration, End-to-End Testing & Refinement (Day 7-9)**
+
+---
+
+| ID   | Task Description                                                                                             | Role(s)    | Prio | Est. Duration | Depends On       | Status |
+
+|------|--------------------------------------------------------------------------------------------------------------|------------|------|---------------|------------------|--------|
+
+| P5.1 | End-to-End Test: Data flow from raw data to frontend display for selected User Stories (US1, US5, US8).        | All        | 1    | 1.5 days      | P2.8, P3.x, P4.x | Open   |
+
+| P5.2 | Bug Fixing (from tests and integration).                                                                     | All        | 1    | Continuous    | P5.1             | Open   |
+
+| P5.3 | Performance Optimization (basic, e.g., DB queries, API response times) – only if critical for demo.            | BE, FE     | 2    | 0.5 days      | P5.1             | Open   |
+
+| P5.4 | UI/UX Polish based on team feedback (minor adjustments).                                                     | FE         | 2    | 0.5 days      | P5.1             | Open   |
+
+| P5.5 | Code cleanup, add comments, documentation (READMEs for components).                                          | All        | 2    | 0.5 days      | -                | Open   |
+
+---
+
+**Phase 6: Deployment & Demo Preparation (Day 9)**
+
+---
+
+| ID   | Task Description                                                                                             | Role(s)    | Prio | Est. Duration | Depends On   | Status |
+
+|------|--------------------------------------------------------------------------------------------------------------|------------|------|---------------|--------------|--------|
+
+| P6.1 | Finalize and test Docker images for Backend and Frontend.                                                      | DO, BE, FE | 1    | 0.5 days      | P1.3, P5.x   | Open   |
+
+| P6.2 | Deploy to target platform ([Render.com](http://Render.com) / Google Cloud Run). Set up Neo4j (AuraDB) and ChromaDB (in backend container or separate). | DO         | 1    | 1 day         | P6.1         | Open   |
+
+| P6.3 | Prepare demo script and presentation `Pitchskript.md` as base).                                               | All        | 1    | 0.5 days      | P5.x         | Open   |
+
+| P6.4 | Rehearse the demo.                                                                                           | All        | 1    | 0.25 days     | P6.2, P6.3   | Open   |
+
+**6. Task Management and Collaboration**
+
+\*   **Daily Stand-ups (15 Min):** What was achieved yesterday? What's planned for today? Any blockers?
+
+\*   **Task Board:** The chosen tool (GitHub Issues, Trello, etc.) will be updated daily. Each team member is responsible for updating their tasks.
+
+\*   **Code Reviews (simplified):** For important components or before merging into the main branch, a second team member should briefly review the code (Pull Requests).
+
+\*   **Communication Channel:** Dedicated channel (e.g., Slack, Discord) for quick discussions.
+
+\*   **Knowledge Sharing:** Regular brief updates on progress in individual areas (backend, frontend, data).
+
+\*   **Main Branch Strategy:** Development in feature branches, regular merging into a `develop` branch. A `main` branch for stable versions/demo releases.
+
+**7. Risk Management (Brief Overview)**
+
+\*   **Time Pressure:** Highest risk. Solution: Strict prioritization on MVP, simplification of features, parallel work.
+
+\*   **Technical Hurdles (LLM integration, graph complexity):** Solution: Early tests with these components, knowledge sharing, simplify logic for MVP if needed.
+
+\*   **Data Quality and Availability:** Solution: Secure and test MVP dataset early. Robust error handling in scripts.
+
+\*   **Team Dependencies:** Solution: Clear task distribution, good communication, flexible role assumption.
+
+\*   **Integration Issues:** Solution: Early and continuous integration of components.
+
+**8. Definition of Done (MVP)**
+
+The MVP is "Done" when:
+
+1.  The data ingestion and processing pipeline for the MVP dataset (at least one example each of PDF, Notebook, Web Article, YouTube Transcript) runs automated or at least script-driven, correctly populating Neo4j and ChromaDB.
+
+2.  Core API endpoints for concept search, semantic search, and RAG Q&A are functional and return correct data.
+
+3.  The frontend allows interactive visualization of the graph for a searched concept.
+
+4.  The frontend allows semantic search and displays results (chunks).
+
+5.  The frontend allows asking a question to the RAG system and displays the generated answer (including sources).
+
+6.  The application is deployed on the chosen platform and accessible for the demo.
+
+7.  A short presentation and live demo of the above points can be successfully conducted.
+
+---
+
+This plan is ambitious but achievable within the bootcamp timeframe with focused work and good team coordination. Flexibility and a willingness to adjust scope if necessary are crucial.
